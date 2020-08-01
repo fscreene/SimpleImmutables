@@ -95,10 +95,6 @@ public class Builder {
                 .build();
     }
 
-    private static String parseName(Class<?> clazz) {
-        return "Immutable" + clazz.getSimpleName();
-    }
-
     private static void addBuilderToClass(TypeName typeName, TypeSpec.Builder classBuilder, String immutableClassName, String immutableBuilderClassName, List<Field> fields) {
         ClassName builderName = ClassName.get("", immutableBuilderClassName);
 
