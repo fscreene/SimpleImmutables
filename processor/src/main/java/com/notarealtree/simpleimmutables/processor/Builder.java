@@ -1,5 +1,6 @@
 package com.notarealtree.simpleimmutables.processor;
 
+import com.notarealtree.simpleimmutables.processor.model.BuilderContainer;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;
@@ -7,7 +8,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -95,62 +95,17 @@ public class Builder {
                 .build();
     }
 
-    private static void addBuilderToClass(TypeName typeName, TypeSpec.Builder classBuilder, String immutableClassName, String immutableBuilderClassName, List<Field> fields) {
-        ClassName builderName = ClassName.get("", immutableBuilderClassName);
-
-        MethodSpec.Builder builderStart = MethodSpec.methodBuilder("builder");
-        builderStart.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        builderStart.returns(builderName);
-        builderStart.addStatement("return new $T()", builderName);
-        classBuilder.addMethod(builderStart.build());
-
-        MethodSpec.Builder builderFrom = MethodSpec.methodBuilder("from");
-        builderFrom.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        builderFrom.returns(builderName);
-        builderFrom.addParameter(typeName, "existing");        builderFrom.addCode("return new $T(", builderName);
-        Optional<String> reducer = fields.stream().map(field -> "existing.get" + field.getName().substring(0,1).toUpperCase() + field.getName().substring(1) + "()").reduce((i1, i2) -> i1 + ",\n" + i2);
-        builderFrom.addCode(reducer.get());
-        builderFrom.addStatement(")");
-        classBuilder.addMethod(builderFrom.build());
-
-        TypeSpec.Builder builder = TypeSpec.classBuilder(immutableBuilderClassName);
-        builder.addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
-        builder.addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build());
-        fields.forEach(field -> {
-            builder.addField(field.getType(), field.getName(), Modifier.PRIVATE);
-        });
-
-        // Parameterized Constructor
-        MethodSpec.Builder parameterizedConstructorBuilder =
-                MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
-        fields.forEach(field -> {
-            parameterizedConstructorBuilder.addParameter(field.getType(), field.getName());
-            parameterizedConstructorBuilder.addStatement("this.$L = $L", field.getName(), field.getName());
-        });
-        builder.addMethod(parameterizedConstructorBuilder.build());
-
-        fields.forEach(field -> {
-            MethodSpec.Builder withBuilder = MethodSpec.methodBuilder(
-                    "with" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
-            withBuilder.addParameter(field.getType(), field.getName());
-            withBuilder.addStatement("this.$L = $L", field.getName(), field.getName());
-            withBuilder.addStatement("return this");
-            withBuilder.addModifiers(Modifier.PUBLIC);
-            withBuilder.returns(builderName);
-            builder.addMethod(withBuilder.build());
-        });
-
-        MethodSpec.Builder buildMethod = MethodSpec.methodBuilder("build");
-        buildMethod.returns(ClassName.get("", immutableClassName));
-        buildMethod.addModifiers(Modifier.PUBLIC);
-        buildMethod.addCode("return new $L(\n", immutableClassName);
-        Optional<String> reduce = fields.stream().map(field -> "    this." + field.getName()).reduce((i1, i2) -> i1 + ",\n" + i2);
-        buildMethod.addCode(reduce.get());
-        buildMethod.addStatement(")");
-
-        builder.addMethod(buildMethod.build());
-
-        classBuilder.addType(builder.build());
+    private static void addBuilderToClass(
+            TypeName typeName,
+            TypeSpec.Builder classBuilder,
+            String immutableClassName,
+            String immutableBuilderClassName,
+            List<Field> fields) {
+        BuilderContainer builderContainer =
+                new BuilderAssembler(typeName, immutableClassName, immutableBuilderClassName, fields).assemble();
+        classBuilder.addMethod(builderContainer.getBuildMethod());
+        classBuilder.addMethod(builderContainer.getFromMethod());
+        classBuilder.addType(builderContainer.getBuilderType());
     }
 
 }
