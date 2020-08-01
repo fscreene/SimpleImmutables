@@ -1,6 +1,7 @@
-package com.notarealtree.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor;
 
-import com.notarealtree.simpleimmutables.processor.model.BuilderContainer;
+import com.fscreene.simpleimmutables.processor.model.BuilderContainer;
+import com.fscreene.simpleimmutables.processor.model.Field;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -71,7 +72,9 @@ public class BuilderAssembler {
         builderFrom.returns(builderName);
         builderFrom.addParameter(typeName, "existing");
         builderFrom.addCode("return new $T(", builderName);
-        Optional<String> reducer = fields.stream().map(field -> "existing.get" + field.getName().substring(0,1).toUpperCase() + field.getName().substring(1) + "()").reduce((i1, i2) -> i1 + ",\n" + i2);
+        Optional<String> reducer = fields.stream()
+                .map(field -> "existing.get" + field.getName().substring(0,1).toUpperCase() + field.getName().substring(1) + "()")
+                .reduce((i1, i2) -> i1 + ",\n" + i2);
         builderFrom.addCode(reducer.get());
         builderFrom.addStatement(")");
         return builderFrom.build();

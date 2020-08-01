@@ -1,4 +1,4 @@
-package com.notarealtree.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

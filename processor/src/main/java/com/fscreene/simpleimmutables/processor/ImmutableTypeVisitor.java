@@ -1,4 +1,4 @@
-package com.notarealtree.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;

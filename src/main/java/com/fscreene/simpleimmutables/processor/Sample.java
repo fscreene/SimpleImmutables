@@ -1,6 +1,4 @@
-package com.notarealtree.simpleimmutables;
-
-import com.notarealtree.simpleimmutables.processor.SimpleImmutable;
+package com.fscreene.simpleimmutables.processor;
 
 import java.util.List;
 import java.util.Map;

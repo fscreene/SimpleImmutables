@@ -1,6 +1,8 @@
-package com.notarealtree.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor;
 
-import com.notarealtree.simpleimmutables.processor.model.BuilderContainer;
+import com.fscreene.simpleimmutables.processor.model.BuilderContainer;
+import com.fscreene.simpleimmutables.processor.model.Field;
+import com.fscreene.simpleimmutables.processor.model.File;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;

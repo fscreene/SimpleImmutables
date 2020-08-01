@@ -1,6 +1,7 @@
-package com.notarealtree.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor;
 
 import com.google.auto.service.AutoService;
+import com.fscreene.simpleimmutables.processor.model.File;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
