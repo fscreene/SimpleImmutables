@@ -17,4 +17,3 @@ dependencies {
     compile group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc7'
     annotationProcessor group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc7'
 }
-println configurations.runtime.resolve()
