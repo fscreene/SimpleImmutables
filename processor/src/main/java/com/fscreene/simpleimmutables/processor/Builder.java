@@ -1,13 +1,13 @@
 package com.fscreene.simpleimmutables.processor;
 
+import com.fscreene.simpleimmutables.processor.annotations.SafeField;
 import com.fscreene.simpleimmutables.processor.model.BuilderContainer;
 import com.fscreene.simpleimmutables.processor.model.Field;
 import com.fscreene.simpleimmutables.processor.model.File;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,9 +19,15 @@ public class Builder {
         String immutableClassName = "Immutable" + ClassName.bestGuess(typeName.toString()).simpleName();
         List<? extends Element> methods = element.getEnclosedElements();
         List<Field> fields = methods.stream().map(method -> {
+            List<? extends AnnotationMirror> annotationMirrors = method.getAnnotationMirrors();
+            boolean isSafeField = annotationMirrors.stream().anyMatch(mirror -> {
+                String accept = mirror.getAnnotationType().asElement().accept(new AnnotationVisitor(), null);
+                return accept.equals(SafeField.class.getCanonicalName());
+            });
             TypeMirror typeMirror = method.asType();
+            typeMirror.getAnnotationMirrors();
             TypeName result = typeMirror.accept(new ImmutableTypeVisitor(), null);
-            return new Field(result, parseFieldName(method.getSimpleName().toString()));
+            return new Field(result, parseFieldName(method.getSimpleName().toString()), isSafeField);
         }).collect(Collectors.toList());
         return new File(immutableClassName, buildImmutable(typeName, fields));
     }
@@ -38,12 +44,17 @@ public class Builder {
         addFieldsToClass(classBuilder, fields);
         addConstructorToClass(classBuilder, fields);
         addGettersToClass(classBuilder, fields);
+        maybeAddToStringToClass(classBuilder, fields);
         addBuilderToClass(typeName, classBuilder, immutableClassName, immutableBuilderClassName, fields);
         JavaFile javaFile = JavaFile
                 .builder(ClassName.bestGuess(typeName.toString()).packageName(), classBuilder.build())
                 .build();
 
         return javaFile.toString();
+    }
+
+    private static void maybeAddToStringToClass(TypeSpec.Builder classBuilder, List<Field> fields) {
+        new ToStringBuilder(fields).build().map(classBuilder::addMethod);
     }
 
     private static void addExtendsToClass(TypeSpec.Builder classBuilder, TypeName typeName) {

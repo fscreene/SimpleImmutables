@@ -1,5 +1,6 @@
 package com.fscreene.simpleimmutables.processor;
 
+import com.fscreene.simpleimmutables.processor.annotations.SimpleImmutable;
 import com.google.auto.service.AutoService;
 import com.fscreene.simpleimmutables.processor.model.File;
 
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.fscreene.simpleimmutables.processor.SimpleImmutable")
+@SupportedAnnotationTypes("com.fscreene.simpleimmutables.processor.annotations.SimpleImmutable")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class SimpleImmutableProcessor extends AbstractProcessor {

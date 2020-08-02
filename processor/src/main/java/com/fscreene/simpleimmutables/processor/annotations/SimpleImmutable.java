@@ -1,4 +1,4 @@
-package com.fscreene.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

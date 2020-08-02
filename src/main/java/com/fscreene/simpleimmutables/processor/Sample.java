@@ -1,5 +1,7 @@
 package com.fscreene.simpleimmutables.processor;
 
+import com.fscreene.simpleimmutables.processor.annotations.SimpleImmutable;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
