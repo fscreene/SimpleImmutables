@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.notarealtree.simpleimmutables.processor.SimpleImmutable")
+@SupportedAnnotationTypes("com.fscreene.simpleimmutables.processor.SimpleImmutable")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class SimpleImmutableProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating Simple Immutable Classes");
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating SimpleImmutable Classes");
         roundEnvironment.getElementsAnnotatedWith(SimpleImmutable.class).forEach(b -> {
             File file = Builder.buildImmutable(b);
             try {
