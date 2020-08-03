@@ -30,7 +30,7 @@ public class ToStringBuilder {
                 .addAnnotation(Override.class);
 
         toStringBuilder.addCode("return \"" + className +"{\" +\n ");
-        Optional<String> reduce = fields.stream()
+        Optional<String> reduce = safeFields.stream()
                 .map(field -> "\"" + field.getName() + "='\" + " + field.getName() + " + \"'\" +")
                 .reduce((i1, i2) -> i1 + "\",\" +\n " + i2);
         toStringBuilder.addCode(reduce.get() +"\n");
