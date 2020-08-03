@@ -11,14 +11,14 @@ import javax.lang.model.element.Modifier;
 import java.util.List;
 import java.util.Optional;
 
-public class BuilderAssembler {
+public class ClassInternalBuilderBuilder {
     private final TypeName typeName;
     private final String immutableClassName;
     private final String immutableBuilderClassName;
     private final List<Field> fields;
     private final ClassName builderName;
 
-    public BuilderAssembler(
+    public ClassInternalBuilderBuilder(
             TypeName typeName,
             String immutableClassName,
             String immutableBuilderClassName,

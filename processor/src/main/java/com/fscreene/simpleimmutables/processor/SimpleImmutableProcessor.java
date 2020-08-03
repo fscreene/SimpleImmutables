@@ -21,7 +21,7 @@ public class SimpleImmutableProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating SimpleImmutable Classes");
         roundEnvironment.getElementsAnnotatedWith(SimpleImmutable.class).forEach(b -> {
-            File file = Builder.buildImmutable(b);
+            File file = ClassBuilder.buildImmutable(b);
             try {
                 JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(file.getName());
                 Writer writer = sourceFile.openWriter();

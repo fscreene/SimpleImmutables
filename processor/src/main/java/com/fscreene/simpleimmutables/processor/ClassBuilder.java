@@ -1,34 +1,25 @@
 package com.fscreene.simpleimmutables.processor;
 
-import com.fscreene.simpleimmutables.processor.annotations.SafeField;
 import com.fscreene.simpleimmutables.processor.model.BuilderContainer;
 import com.fscreene.simpleimmutables.processor.model.Field;
 import com.fscreene.simpleimmutables.processor.model.File;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;
-import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class Builder {
+public class ClassBuilder {
     public static File buildImmutable(Element element) {
         TypeName typeName = ClassName.get(element.asType());
         String immutableClassName = "Immutable" + ClassName.bestGuess(typeName.toString()).simpleName();
         List<? extends Element> methods = element.getEnclosedElements();
-        List<Field> fields = methods.stream().map(method -> {
-            List<? extends AnnotationMirror> annotationMirrors = method.getAnnotationMirrors();
-            boolean isSafeField = annotationMirrors.stream().anyMatch(mirror -> {
-                String accept = mirror.getAnnotationType().asElement().accept(new AnnotationVisitor(), null);
-                return accept.equals(SafeField.class.getCanonicalName());
-            });
-            TypeMirror typeMirror = method.asType();
-            typeMirror.getAnnotationMirrors();
-            TypeName result = typeMirror.accept(new ImmutableTypeVisitor(), null);
-            return new Field(result, parseFieldName(method.getSimpleName().toString()), isSafeField);
-        }).collect(Collectors.toList());
+        List<Field> fields = methods.stream()
+                .map(method -> new FieldParser(method).parse())
+                .collect(Collectors.toList());
         return new File(immutableClassName, buildImmutable(typeName, fields));
     }
 
@@ -84,17 +75,8 @@ public class Builder {
     }
 
     private static void addFieldsToClass(TypeSpec.Builder classBuilder, List<Field> fields) {
-        fields.forEach(field -> {
-            classBuilder.addField(field.getType(), field.getName(), Modifier.PRIVATE, Modifier.FINAL);
-        });
-    }
-
-    // This doesn't work if a method is called getInt() because the result will be int(). Need to fix.
-    private static String parseFieldName(String fieldName) {
-        if (fieldName.startsWith("get")) {
-            return fieldName.substring(3,4).toLowerCase() + fieldName.substring(4);
-        }
-        return fieldName;
+        fields.forEach(field ->
+                classBuilder.addField(field.getType(), field.getName(), Modifier.PRIVATE, Modifier.FINAL));
     }
 
     private static void makePublicFinal(TypeSpec.Builder builder) {
@@ -115,7 +97,7 @@ public class Builder {
             String immutableBuilderClassName,
             List<Field> fields) {
         BuilderContainer builderContainer =
-                new BuilderAssembler(typeName, immutableClassName, immutableBuilderClassName, fields).assemble();
+                new ClassInternalBuilderBuilder(typeName, immutableClassName, immutableBuilderClassName, fields).assemble();
         classBuilder.addMethod(builderContainer.getBuildMethod());
         classBuilder.addMethod(builderContainer.getFromMethod());
         classBuilder.addType(builderContainer.getBuilderType());

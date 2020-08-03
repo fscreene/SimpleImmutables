@@ -1,4 +1,4 @@
-import com.fscreene.simpleimmutables.processor.ImmutableTypeVisitor;
+import com.fscreene.simpleimmutables.processor.visitors.ImmutableTypeVisitor;
 import com.squareup.javapoet.TypeName;
 import org.junit.jupiter.api.Test;
 

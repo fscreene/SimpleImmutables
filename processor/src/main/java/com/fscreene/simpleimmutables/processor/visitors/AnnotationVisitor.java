@@ -1,4 +1,4 @@
-package com.fscreene.simpleimmutables.processor;
+package com.fscreene.simpleimmutables.processor.visitors;
 
 import javax.lang.model.element.*;
 
