@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 
 public class ToStringBuilder {
     private final List<Field> fields;
+    private final String className;
 
-    public ToStringBuilder(List<Field> fields) {
+    public ToStringBuilder(List<Field> fields, String className) {
         this.fields = fields;
+        this.className = className;
     }
 
     public Optional<MethodSpec> build() {
@@ -27,14 +29,13 @@ public class ToStringBuilder {
                 .returns(TypeName.get(String.class))
                 .addAnnotation(Override.class);
 
-        toStringBuilder.addCode("return \"\"\n    + ");
+        toStringBuilder.addCode("return \"" + className +"{\" +\n ");
         Optional<String> reduce = fields.stream()
-                .map(field -> "\"" + field.getName() + "=\" + this." + field.getName() + "")
-                .reduce((i1, i2) -> i1 + "\n    + " + i2);
-        toStringBuilder.addStatement(reduce.get());
+                .map(field -> "\"" + field.getName() + "='\" + " + field.getName() + " + \"'\" +")
+                .reduce((i1, i2) -> i1 + "\",\" +\n " + i2);
+        toStringBuilder.addCode(reduce.get() +"\n");
+        toStringBuilder.addStatement("\"}\"");
 
         return Optional.of(toStringBuilder.build());
     }
-
-
 }

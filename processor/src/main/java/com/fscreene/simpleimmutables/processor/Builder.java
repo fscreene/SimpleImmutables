@@ -44,7 +44,7 @@ public class Builder {
         addFieldsToClass(classBuilder, fields);
         addConstructorToClass(classBuilder, fields);
         addGettersToClass(classBuilder, fields);
-        maybeAddToStringToClass(classBuilder, fields);
+        maybeAddToStringToClass(classBuilder, ClassName.bestGuess(typeName.toString()).simpleName(), fields);
         addBuilderToClass(typeName, classBuilder, immutableClassName, immutableBuilderClassName, fields);
         JavaFile javaFile = JavaFile
                 .builder(ClassName.bestGuess(typeName.toString()).packageName(), classBuilder.build())
@@ -53,8 +53,8 @@ public class Builder {
         return javaFile.toString();
     }
 
-    private static void maybeAddToStringToClass(TypeSpec.Builder classBuilder, List<Field> fields) {
-        new ToStringBuilder(fields).build().map(classBuilder::addMethod);
+    private static void maybeAddToStringToClass(TypeSpec.Builder classBuilder, String className, List<Field> fields) {
+        new ToStringBuilder(fields, className).build().map(classBuilder::addMethod);
     }
 
     private static void addExtendsToClass(TypeSpec.Builder classBuilder, TypeName typeName) {
